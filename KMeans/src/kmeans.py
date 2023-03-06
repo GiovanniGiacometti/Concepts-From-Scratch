@@ -48,7 +48,6 @@ class KMeans:
     def predict(self):
         return self.labels_
     
-
     def kmeansplusplus(self, X):
         possible_indexes = list(range(X.shape[0]))
 

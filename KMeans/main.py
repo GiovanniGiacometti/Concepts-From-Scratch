@@ -13,6 +13,8 @@ if __name__ == "__main__":
         plt.scatter(X[:,0], X[:,1])
         plt.figure()
 
+        #------------------
+
         X = StandardScaler().fit_transform(X)
 
         kmeans = KMeans(n_clusters = 3,init="kmeans++")
@@ -40,12 +42,3 @@ if __name__ == "__main__":
 
 
         plt.show()
-
-
-        params = {
-                "n_clusters":3,
-                "n_iter":1,
-                "init" : "random"
-        }
-
-        Animator(X=X, algorithm=KMeans,params=params, save = True, name = "animation.gif").plot()
