@@ -22,7 +22,7 @@ if __name__ == "__main__":
         cluster_prediction = kmeans.fit(X).predict()
         centroids = kmeans.centroids_
 
-        plt.scatter(X[:,0], X[:,1], c=cluster_prediction)
+        plt.scatter(X[:, 0], X[:, 1], c=cluster_prediction)
         plt.scatter(centroids[:,0], centroids[:,1], c="r")
 
         #------------------
