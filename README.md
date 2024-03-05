@@ -1,3 +1,1 @@
-# Algorithms-From-Scratch
-
-Building some ML algo from scratch.
+# ML-Concepts-From-Scratch
