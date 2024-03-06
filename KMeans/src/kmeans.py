@@ -1,22 +1,59 @@
 import numpy as np
+from enum import Enum
+from typing import Optional
+
+
+class KMeansInitMethod(Enum):
+    RANDOM = "random"
+    KMEANSPLUSPLUS = "kmeans++"
+    CENTROIDS = "centroids"
+
 
 class KMeans:
-    def __init__(self, n_clusters=5,init = "random", 
-                            n_iter = 100,tol = 1e-4):
+    def __init__(self, 
+                 n_clusters: int, 
+                 init: KMeansInitMethod, 
+                 centroids: Optional[np.ndarray] = None, 
+                 n_iter: int = 100, 
+                 seed: Optional[int] = None,
+                 tol: float = 1e-4):
 
         self.n_clusters = n_clusters
-        self.n_iter = n_iter #number of iterations the algorithm will run
-        self.tol = tol #centroid updates threshold
-        self.init = init #centroids initialization method
+
+        # number of iterations the algorithm will run
+        # if the centroids do not converge
+        self.n_iter = n_iter  
+
+        # centroid updates threshold
+        self.tol = tol
+
+        if centroids is not None:
+            if init != KMeansInitMethod.CENTROIDS:
+                raise ValueError("Centroids were provided but init is not 'centroids'")
+            
+        if seed is not None:
+            np.random.seed(seed)
         
-    def fit(self,X):
-        if type(self.init) is np.ndarray:
+        self.centroids_ = centroids
+        self.init_method = init
+
+        self.fitted = False
+        
+    def fit(self, X) -> "KMeans":
+        
+        if len(X.shape) < 2:
+            raise ValueError("X must have at least 2 dimensions")
+
+        if self.init_method == KMeansInitMethod.CENTROIDS:
             self.centroids_ = self.init
-        elif "kmeans++" in self.init:
-            self.centroids_ = self.kmeansplusplus(X)
-        elif "random" in self.init: 
+
+        elif self.init_method == KMeansInitMethod.KMEANSPLUSPLUS:
+            self.centroids_ = self._kmeansplusplus(X)
+
+        elif self.init_method == KMeansInitMethod.RANDOM: 
             centroids_indexes = np.random.randint(X.shape[0], size = self.n_clusters)
             self.centroids_ = X[centroids_indexes,:]
+
         else:
             raise ValueError("Invalid initialization method")
         
@@ -25,15 +62,16 @@ class KMeans:
         for _ in range(self.n_iter):
 
             for i in range(X.shape[0]):
+
                 point = X[i,:]
-                distances_to_centroids = [np.linalg.norm(point - centroid)         
-                                    for centroid in self.centroids_]
+                distances_to_centroids = [np.linalg.norm(point - centroid) for centroid in self.centroids_]
                 closest = np.argmin(distances_to_centroids)
                 self.labels_[i] = closest
 
             new_centroids = []
 
             for cluster in range(self.n_clusters):
+
                 cluster_points = X[self.labels_ == cluster]
                 new_centroids.append(np.mean(cluster_points, axis = 0))
                 
@@ -43,12 +81,19 @@ class KMeans:
                 break
             else:
                 self.centroids_ = np_new_centroids
+
+        self.fitted = True
         return self
 
-    def predict(self):
+    def predict(self) -> np.ndarray:
+
+        if not self.fitted:
+            raise ValueError("The model has not been fitted yet")
+        
         return self.labels_
     
-    def kmeansplusplus(self, X):
+    def _kmeansplusplus(self, X: np.ndarray) -> np.ndarray:
+
         possible_indexes = list(range(X.shape[0]))
 
         first_centroid_index = np.random.choice(possible_indexes)
@@ -57,6 +102,7 @@ class KMeans:
         centroids = [X[first_centroid_index,:]]
 
         for _ in range(self.n_clusters - 1):
+
             distances = []
             for i in possible_indexes:
                 point = X[i,:]

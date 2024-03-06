@@ -1,15 +1,15 @@
 import numpy as np
 from sklearn.datasets import make_blobs
-from src import KMeans
+from src import KMeans, KMeansInitMethod
 from sklearn.preprocessing import StandardScaler
 import matplotlib.pyplot as plt
 
-seed  = 24
-np.random.seed(seed)
 
 if __name__ == "__main__": 
 
-        X, _ = make_blobs(centers=3, n_samples=1500, random_state=seed)
+        SEED = 0
+
+        X, _ = make_blobs(centers=3, n_samples=1500, random_state=SEED)
         
         plt.title("Data")
         plt.scatter(X[:,0], X[:,1])
@@ -19,7 +19,7 @@ if __name__ == "__main__":
 
         X = StandardScaler().fit_transform(X)
 
-        kmeans = KMeans(n_clusters = 3, init="kmeans++")
+        kmeans = KMeans(n_clusters=3, init=KMeansInitMethod.KMEANSPLUSPLUS, seed=SEED)
 
         cluster_prediction = kmeans.fit(X).predict()
         centroids = kmeans.centroids_
@@ -36,13 +36,13 @@ if __name__ == "__main__":
 
         for i in range(len(axs)):
 
-                kmeans = KMeans(n_clusters = i+2,init="kmeans++")
+                kmeans = KMeans(n_clusters=i+2, init=KMeansInitMethod.KMEANSPLUSPLUS)
                 
                 cluster_prediction = kmeans.fit(X).predict()
                 centroids = kmeans.centroids_
 
                 axs[i].set_title(f"KMeans with K = {i+2}")
-                axs[i].scatter(X[:,0], X[:,1], c=cluster_prediction)
-                axs[i].scatter(centroids[:,0], centroids[:,1], c="r")
+                axs[i].scatter(X[:, 0], X[:, 1], c=cluster_prediction)
+                axs[i].scatter(centroids[:, 0], centroids[:, 1], c="r")
 
         plt.show()

@@ -1,6 +1,5 @@
 
-from .animator import Animator
-from .kmeans import KMeans
+from .kmeans import KMeans, KMeansInitMethod
 
 
-__all__ = ['Animator', 'KMeans']
+__all__ = ['KMeansInitMethod', 'KMeans']
