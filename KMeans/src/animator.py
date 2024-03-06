@@ -33,11 +33,10 @@ class Animator():
 
         return self.scatter_points, self.scatter_centroids_,
 
-
     def update(self,frame):
         self.scatter_points.set_offsets(self.dataset)
 
-        if frame != 0: #set colors only after second iteration so that no clusters are shown at the beginning
+        if frame != 0: # set colors only after second iteration so that no clusters are shown at the beginning
             self.scatter_points.set_array(self.clustering)
         
         self.scatter_centroids_.set_offsets(self.centroids_)
@@ -53,15 +52,19 @@ class Animator():
 
     
     def plot(self):
+
         anim = FuncAnimation(self.fig, self.update, frames = self.frames ,interval = 1000, repeat = False ,blit=True, init_func=self.init)
         
-
         if self.save:
+
             dir_name = "results"
             if not os.path.isdir(dir_name):
                 os.makedirs(dir_name)
-            anim.save(f"{dir_name}/{self.name}", writer=PillowWriter(fps=self.fps) )
+
+            anim.save(f"{dir_name}/{self.name}", writer=PillowWriter(fps=self.fps))
+
         else:
+
             plt.show()
 
         
